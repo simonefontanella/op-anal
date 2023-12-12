@@ -1,0 +1,3 @@
+https://www.kaggle.com/code/rkamath1/time-series-analysis-on-us-unemployment-rate/notebook
+
+https://github.com/eliamarcantognini/operational-analytics-exs/blob/main/assignments/marcantognini_power_consumption.py
