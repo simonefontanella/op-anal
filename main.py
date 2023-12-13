@@ -8,7 +8,7 @@ def plot_time_series(x, y):
 
 
 # load data
-data = pd.read_csv("..\\dataset\\output.csv", sep=",")
+data = pd.read_csv("../dataset/output.csv", sep=",")
 # data exploration
 print("----------------\nData exploration\n----------------")
 print(data.info())
@@ -50,7 +50,14 @@ def difference(data, interval=1):
 
 diff_values = df["Rate"].diff().dropna()
 # plt.plot(diff_values)
-plt.plot(df["Rate"])
+# plt.plot(df["Rate"])
+# plt.show()
+
+from statsmodels.graphics.tsaplots import plot_acf
+plot_acf(diff_values[:20000], lags=100)  # Lags indica quanti ritardi visualizzare
+plt.title('Autocorrelogramma della Serie Temporale')
+plt.xlabel('Ritardi Temporali')
+plt.ylabel('Valore di Autocorrelazione')
 plt.show()
 
 """
