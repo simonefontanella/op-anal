@@ -8,7 +8,7 @@ def plot_time_series(x, y):
 
 
 # load data
-data = pd.read_csv("../dataset/climate.txt", sep=",")
+data = pd.read_csv("rimini_climate.txt", sep=",")
 # data exploration
 print("----------------\nData exploration\n----------------")
 print(data.info())
@@ -17,57 +17,63 @@ print(data.shape)
 print(data.head(5))
 print("----------------")
 
+
+data = data.drop(columns=["min_temp", "max_temp"])
+
+print("----------------\nData after drop min_temp, max_temp\n----------------")
+print(data.head(5))
+print("----------------")
+"""
 from statsmodels.graphics.tsaplots import plot_acf
-plot_acf(data[' temp_avg'][:20000], lags=20)  # Lags indica quanti ritardi visualizzare
+plot_acf(data['avg_temp'][:200000], lags=20)  # Lags indica quanti ritardi visualizzare
 plt.title('Autocorrelogramma della Serie Temporale')
 plt.xlabel('Ritardi Temporali')
 plt.ylabel('Valore di Autocorrelazione')
 plt.show()
+"""
 
-exit(0)
 
-plt.plot(data['close'],label='close')
-plt.plot(data['open'],label='open')
-plt.plot(data['high'],label='high')
-plt.plot(data['low'],label='low')
-plt.legend()
+# average of avg_temp group by day (21915)
 
+group_df = data.groupby("day")["avg_temp"].mean().reset_index(name ='avg_temp')
+group_df["day"] = pd.to_datetime(group_df["day"], format="%Y%m%d")
+group_df.reset_index(drop=True, inplace=True)
+group_df = group_df.set_index("day")
+
+# average of temp group by month
+group_df["month"] = group_df.index.month
+group_df["year"] = group_df.index.year
+pivot_month = pd.pivot_table(group_df, values = "avg_temp", index="month", columns="year", aggfunc="mean")
+print(pivot_month)
+pivot_month.plot()
 plt.show()
 
-# Rimuovi il trend tramite differenziazione
-serie_temporale_senza_trend = np.diff(data['close'])
 
-# Visualizza la serie temporale senza trend
-plt.figure(figsize=(10, 5))
-plt.plot(serie_temporale_senza_trend, label='Serie Temporale senza Trend')
-plt.title('Serie Temporale Senza Trend (Differenziazione)')
-plt.legend()
+print("----------------\nGroup by day\n----------------")
+print(group_df.head(5))
+print(group_df.describe())
+print(group_df.tail(20))
+print("----------------")
+group_df = data.groupby("day")["avg_temp"].mean().reset_index(name ='avg_temp')
+
+
+"""
+fig, axes = plt.subplots(2)
+axes[0].plot(group_df["avg_temp"][:2000])
+
+
+diff_values = group_df["avg_temp"].diff().dropna()
+
+axes[1].plot(diff_values[:2000])
 plt.show()
+fig, axes = plt.subplots(2)
+diff_values = group_df["avg_temp"].diff().dropna()
+from statsmodels.graphics.tsaplots import plot_acf
+plot_acf( group_df["avg_temp"], lags=90, ax = axes[0])  # Lags indica quanti ritardi visualizzare
+plot_acf( diff_values, lags=90, ax = axes[1])  # Lags indica quanti ritardi visualizzare
 
-# annual_rate = data.groupby("Year")["Rate"].mean()
-
-# # Plotting
-# plt.plot(
-#     annual_rate.index, annual_rate.values, label="Annual mean US unemployment rate"
-# )
-# plt.title("Annual mean US unemployment rate")
-# plt.xlabel("Year")
-# plt.ylabel("Unemployment Rate")
-# plt.legend()
-# # plt.show()
-
-# df = data.drop(columns=["Month", "State", "County"])
-# print(df)
-
-
-# def difference(data, interval=1):
-#     return [data[i] - data[i - interval] for i in range(interval, len(data))]
-
-
-# diff_values = df["Rate"].diff().dropna()
-# # plt.plot(diff_values)
-# # plt.plot(df["Rate"])
-# # plt.show()
-
-
-exit(0)
+plt.title('Autocorrelogramma della Serie Temporale')
+plt.xlabel('Ritardi Temporali')
+plt.ylabel('Valore di Autocorrelazione')
+plt.show()
+"""
